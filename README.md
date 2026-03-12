@@ -2,7 +2,8 @@
 
 A library for finding the most similar word from a list of words, supporting Japanese (including kanji).
 
-> **Note:** It may be a little slow because it uses morphological analysis. By adopting `worker_threads`, the processing speed is slightly improved compared to the standard.
+> [!Note]  
+> It may be a little slow because it uses morphological analysis. By adopting `worker_threads`, the processing speed is slightly improved compared to the standard.
 
 日本語のドキュメントは [README-ja.md](README-ja.md) を参照してください。
 
