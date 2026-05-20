@@ -17,11 +17,11 @@ npm install closewords
 
 ### `closeWords(word, candidates, raw?)`
 
-| パラメータ    | 型                                                       | デフォルト | 説明                            |
-| ------------ | -------------------------------------------------------- | ---------- | ------------------------------- |
-| `word`       | `string \| { word: string; pronounce?: string }`         | —          | 比較対象の単語またはオブジェクト |
-| `candidates` | `Array<string \| { word: string; pronounce?: string }>` | —          | 候補単語のリスト                 |
-| `raw`        | `boolean`                                                | `false`    | 類似度スコアを含めるか           |
+| パラメータ | 型 | デフォルト | 説明 |
+| --- | --- | --- | --- |
+| `word` | `string \| { word: string; pronounce?: string }` | — | 比較対象の単語またはオブジェクト |
+| `candidates` | `Array<string \| { word: string; pronounce?: string }>` | — | 候補単語のリスト |
+| `raw` | `boolean` | `false` | 類似度スコアを含めるか |
 
 **戻り値:** `raw` が `false` のとき `Promise<string[]>`、`true` のとき `Promise<Array<{ word: string; score: number }>>` を返します。
 
@@ -52,39 +52,8 @@ console.log(resultWithScores);
 
 ## 変更履歴
 
-### 2.3.1 --> 3.0.0
-TypeScript で書き直しました。`tsdown` によるバンドルを導入しました。  
-ソースファイルを `src/` に集約しました。README を英語版・日本語版に分離しました。
+全バージョンの変更履歴は [CHANGELOG-ja.md](CHANGELOG-ja.md) を参照してください。
 
-### 2.2.0 --> 2.3.0
-ヘボン式補完を改善しました。コードをフォーマットしました。
+## ライセンス
 
-### 2.1.4 --> 2.2.0
-`word.pronounce` と `candidates[]` 内の `pronounce` をヘボン式で補完するようにしました。
-
-### 2.1.3 --> 2.1.4
-バグを修正しました。
-
-### 2.1.2 --> 2.1.3
-スコア計算方法を修正しました。
-
-### 2.1.1 --> 2.1.2
-スコア計算方法を修正しました。
-
-### 2.1.0 --> 2.1.1
-`README` を修正しました。`word` に文字列以外指定できない問題を修正しました。`word.pronounce` が無視される問題を修正しました。`word.pronounce` と `candidates[]` 内の `pronounce` にアルファベット以外を指定できる問題を修正しました。`word.pronounce` と `candidates[]` 内の `pronounce` を任意にしました。その他数件のバグを修正しました。
-
-### 2.0.0 --> 2.1.0
-単語の発音を指定する方法を追加しました。
-
-### 1.0.2 --> 2.0.0
-`fast-levenshtein` を導入し、スコア計算方法を修正しました。元の文字列の一致度も評価されるようになりました。
-
-### 1.0.1 --> 1.0.2
-`jaro-winkler` を導入し、最適化しました。
-
-### 1.0.0 --> 1.0.1
-スコア計算方法を修正しました。
-
-### 0.x --> 1.0.0
-パッケージをリリース！ 形態素解析を導入しました。
+[ISC License](LICENSE)
