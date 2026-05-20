@@ -22,7 +22,8 @@
     "README.md",
     "README-ja.md",
     "CHANGELOG.md",
-    "CHANGELOG-ja.md"
+    "CHANGELOG-ja.md",
+    "LICENSE"
   ],
   "scripts": {
     "build": "tsdown && node scripts/copy-dict.cjs",
