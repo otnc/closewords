@@ -44,7 +44,7 @@ function toRomajiWord(
   return toRomaji(hiragana);
 }
 
-// --- Legacy mode: one-shot via workerData (for backward compat) ---
+// legacy: one-shot via workerData
 if (workerData) {
   const { words, dicPath } = workerData as { words: WordInput[]; dicPath: string };
   (async () => {
@@ -57,7 +57,7 @@ if (workerData) {
   })();
 }
 
-// --- Persistent mode: listen for messages ---
+// persistent mode: listen for messages
 parentPort!.on('message', async (msg: WorkerMessage) => {
   try {
     const tok = await initializeTokenizer(msg.dicPath);
