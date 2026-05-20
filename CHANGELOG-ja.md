@@ -2,6 +2,10 @@
 
 English changelog: [CHANGELOG.md](CHANGELOG.md)
 
+## [3.1.1]
+
+依存関係を修正。
+
 ## [3.1.0]
 
 ESM import をサポートしました。`tsdown` による CJS/ESM デュアルビルド出力を追加しました。

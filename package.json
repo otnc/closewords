@@ -1,6 +1,6 @@
 {
   "name": "closewords",
-  "version": "3.1.0",
+  "version": "3.1.1",
   "description": "A library for finding the most similar word from a list of words, supporting Japanese (including kanji). / 最も似た単語を単語群から検索する日本語(漢字含む)対応のライブラリ",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
@@ -80,8 +80,8 @@
     "fs-extra": "^11.3.5",
     "jest": "^30.4.2",
     "ts-jest": "^29.4.10",
-    "tsdown": "^0.21.10",
-    "tsx": "^4.22.3",
-    "typescript": "^6.0.3"
+    "tsdown": "0.21.10",
+    "tsx": "4.22.3",
+    "typescript": "6.0.3"
   }
 }
