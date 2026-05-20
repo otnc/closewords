@@ -9,9 +9,7 @@ export type { Candidate, CloseWordsResult, AlphabeticString } from './types';
 
 type WordInput = string | Candidate;
 
-// ---------------------------------------------------------------------------
-// Persistent worker — kuromoji の辞書を初回のみ読み込み、以降は再利用する
-// ---------------------------------------------------------------------------
+// persistent worker: kuromoji の辞書を初回のみ読み込み、以降は再利用する
 
 let workerInstance: Worker | null = null;
 let requestId = 0;
@@ -24,9 +22,9 @@ function getWorker(): Worker {
   if (workerInstance) return workerInstance;
 
   const isTs = __filename?.endsWith('.ts') ?? false;
-  const workerFile = isTs
-    ? path.resolve(__dirname, './worker.ts')
-    : path.resolve(__dirname, './worker.cjs');
+  // tsdown の shims: true により ESM ビルドでも __filename / __dirname が利用可能
+  const workerExt = isTs ? '.ts' : __filename?.endsWith('.mjs') ? '.mjs' : '.cjs';
+  const workerFile = path.resolve(__dirname, `./worker${workerExt}`);
   const execArgv = isTs ? ['--require', 'tsx/cjs'] : [];
 
   const w = new Worker(workerFile, { execArgv });
@@ -42,8 +40,8 @@ function getWorker(): Worker {
     }
   );
 
-  w.on('error', (err) => {
-    for (const p of pending.values()) p.reject(err as Error);
+  w.on('error', (err: Error) => {
+    for (const p of pending.values()) p.reject(err);
     pending.clear();
     workerInstance = null;
   });
@@ -74,13 +72,16 @@ function convertToRomaji(
 }
 
 /**
- * Finds the closest strings in an array to the given word.
- * 与えられた単語に最も近い単語を候補リストから探します。
+ * Finds the closest word(s) from candidates to the given reference word.
+ * Supports Japanese (including kanji via morphological analysis) and alphabetic strings.
  *
- * @param word  - The reference word or object. / 比較対象の単語またはオブジェクト
- * @param candidates - Candidate words or objects. / 候補リスト
- * @param raw - Whether to include similarity scores (default: false). / 類似度スコアを含むか
- * @returns The closest word(s) or detailed scores. / 最も類似した単語または詳細なスコア
+ * 与えられた単語に最も近い候補単語を返します。
+ * 日本語（漢字を含む形態素解析）およびアルファベット文字列に対応しています。
+ *
+ * @param word - Reference word or candidate object. / 比較対象の単語またはオブジェクト
+ * @param candidates - List of candidate words or objects. / 候補リスト
+ * @param raw - If true, returns all candidates with scores sorted descending. Default: false. / true のとき全候補をスコア降順で返す。デフォルト: false
+ * @returns When raw is false: word(s) with the highest score. When raw is true: all candidates with scores. / raw が false のとき最高スコアの単語配列、true のとき全候補のスコア付き配列
  */
 export async function closeWords(
   word: WordInput,
@@ -139,15 +140,12 @@ export async function closeWords(
 
   const searchWord = typeof word === 'string' ? word : word.word;
   const baseLength = searchWord.length;
-  // 配列化・Set 化を1回だけ行う
   const searchChars = Array.from(searchWord);
-  const searchCharSet = new Set(searchChars);
 
   const scores: CloseWordsResult[] = candidates.map((candidate, index) => {
     const candidateWord =
       typeof candidate === 'string' ? candidate : candidate.word;
 
-    // 完全一致は即座に 1.0 を返す
     if (searchWord === candidateWord) {
       return { word: candidateWord, score: 1 };
     }
@@ -172,26 +170,20 @@ export async function closeWords(
     }
     const prefixRatio = prefixMatch / maxLen;
 
-    // 文字の包含率 (Set で O(1) ルックアップ)
+    // 文字の包含率
     let charMatchCount = 0;
     for (const ch of searchChars) {
       if (candidateWord.includes(ch)) charMatchCount++;
     }
     const charRatio = charMatchCount / maxLen;
 
-    // 完全一致ボーナス (文字包含率ベース)
     const exactCharBonus = charRatio * 0.4;
-
-    // 長さペナルティ
     const lengthPenalty = Math.max(
       0.7,
       1 - Math.abs(baseLength - candidateLength) / baseLength
     );
-
-    // 先頭一致ボーナス
     const prefixBonus = prefixRatio > 0 ? prefixRatio * 0.05 : 0;
 
-    // スコア算出
     const combinedScore =
       (romajiScore * 0.7 + stringScore * 0.2 + charRatio * 0.1) *
         lengthPenalty +
